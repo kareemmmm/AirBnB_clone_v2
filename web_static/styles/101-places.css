@@ -1,0 +1,30 @@
+/* Responsive media queries */
+@media screen and (max-width: 992px) {
+    .places article {
+        width: 45%;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .places article {
+        width: 100%;
+        margin: 20px 0;
+    }
+    
+    .filters {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .locations, .amenities {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #DDDDDD;
+        padding: 15px 30px;
+    }
+
+    .filters button {
+        width: 90%;
+        margin: 15px auto;
+    }
+}
