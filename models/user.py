@@ -1,12 +1,13 @@
 #!/usr/bin/python3
 """Defines the User class."""
-from models.base_model import BaseModel
+from sqlalchemy import Column, String
+from models.base_model import BaseModel, Base
 
 
-class User(BaseModel):
-    """Represent a User in the AirBnB system."""
-
-    email = ""
-    password = ""
-    first_name = ""
-    last_name = ""
+class User(BaseModel, Base):
+    """Represents a user for a MySQL database."""
+    __tablename__ = 'users'
+    email = Column(String(128), nullable=False)
+    password = Column(String(128), nullable=False)
+    first_name = Column(String(128), nullable=True)
+    last_name = Column(String(128), nullable=True)
