@@ -4,7 +4,6 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from models.base_model import Base
-from models.base_model import BaseModel
 from models.user import User
 from models.state import State
 from models.city import City
@@ -41,7 +40,7 @@ class DBStorage:
 
         if cls:
             if isinstance(cls, str):
-                cls = eval(cls)
+                cls = globals().get(cls, cls)
             query = self.__session.query(cls)
             for obj in query.all():
                 key = "{}.{}".format(obj.__class__.__name__, obj.id)
@@ -64,7 +63,7 @@ class DBStorage:
 
     def delete(self, obj=None):
         """Delete from the current database session obj if not None."""
-        if obj:
+        if obj is not None:
             self.__session.delete(obj)
 
     def reload(self):
