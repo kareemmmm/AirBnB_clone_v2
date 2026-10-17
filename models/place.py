@@ -1,7 +1,11 @@
 #!/usr/bin/python3
 """Defines the Place class."""
+import os
 from sqlalchemy import Column, String, Integer, Float, ForeignKey
+from sqlalchemy.orm import relationship
 from models.base_model import BaseModel, Base
+from models.review import Review
+import models
 
 
 class Place(BaseModel, Base):
@@ -17,3 +21,20 @@ class Place(BaseModel, Base):
     price_by_night = Column(Integer, nullable=False, default=0)
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
+
+    if os.getenv('HBNB_TYPE_STORAGE') == 'db':
+        reviews = relationship(
+            'Review',
+            backref='place',
+            cascade='all, delete-orphan'
+        )
+    else:
+        @property
+        def reviews(self):
+            """Getter attribute for FileStorage relationship with Review."""
+            review_list = []
+            all_reviews = models.storage.all(Review)
+            for review in all_reviews.values():
+                if review.place_id == self.id:
+                    review_list.append(review)
+            return review_list
