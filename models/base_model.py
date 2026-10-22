@@ -18,23 +18,23 @@ class BaseModel:
 
     def __init__(self, *args, **kwargs):
         """Instantiates a new model."""
-        if not kwargs:
-            self.id = str(uuid.uuid4())
-            self.created_at = datetime.utcnow()
-            self.updated_at = datetime.utcnow()
-        else:
+        if kwargs:
             for key, value in kwargs.items():
                 if key == "created_at" or key == "updated_at":
                     if isinstance(value, str):
                         value = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f")
                 if key != "__class__":
                     setattr(self, key, value)
-            if not hasattr(self, "id") or not self.id:
+            if "id" not in kwargs:
                 self.id = str(uuid.uuid4())
-            if not hasattr(self, "created_at") or not self.created_at:
+            if "created_at" not in kwargs:
                 self.created_at = datetime.utcnow()
-            if not hasattr(self, "updated_at") or not self.updated_at:
+            if "updated_at" not in kwargs:
                 self.updated_at = datetime.utcnow()
+        else:
+            self.id = str(uuid.uuid4())
+            self.created_at = datetime.utcnow()
+            self.updated_at = datetime.utcnow()
 
     def __str__(self):
         """Returns a string representation of the instance."""

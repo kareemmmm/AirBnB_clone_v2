@@ -36,17 +36,25 @@ class DBStorage:
     def all(self, cls=None):
         """Query on the current database session all objects."""
         obj_dict = {}
-        classes = [State, City, User, Place, Amenity, Review]
+        classes = {
+            "State": State,
+            "City": City,
+            "User": User,
+            "Place": Place,
+            "Amenity": Amenity,
+            "Review": Review
+        }
 
         if cls:
             if isinstance(cls, str):
-                cls = globals().get(cls, cls)
-            query = self.__session.query(cls)
-            for obj in query.all():
-                key = "{}.{}".format(obj.__class__.__name__, obj.id)
-                obj_dict[key] = obj
+                cls = classes.get(cls)
+            if cls:
+                query = self.__session.query(cls)
+                for obj in query.all():
+                    key = "{}.{}".format(obj.__class__.__name__, obj.id)
+                    obj_dict[key] = obj
         else:
-            for c in classes:
+            for c in classes.values():
                 query = self.__session.query(c)
                 for obj in query.all():
                     key = "{}.{}".format(obj.__class__.__name__, obj.id)
@@ -65,6 +73,7 @@ class DBStorage:
         """Delete from the current database session obj if not None."""
         if obj is not None:
             self.__session.delete(obj)
+            self.save()
 
     def reload(self):
         """Create all tables in the database and initialize session."""
@@ -78,4 +87,4 @@ class DBStorage:
 
     def close(self):
         """Call remove() on private session attribute."""
-        self.__session.close()
+        self.__session.remove()
