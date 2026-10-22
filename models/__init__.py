@@ -1,5 +1,5 @@
-#!/usr/init/python3
-"""Instantiates a storage object depending on environment variable."""
+#!/usr/bin/python3
+"""Instantiates a storage object depending on the environment variable."""
 import os
 
 if os.getenv('HBNB_TYPE_STORAGE') == 'db':

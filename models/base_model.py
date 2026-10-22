@@ -3,37 +3,33 @@
 import uuid
 from datetime import datetime
 from sqlalchemy import Column, String, DateTime
-from sqlalchemy.ext.declarative import declarative_base
+
+try:
+    from sqlalchemy.orm import declarative_base
+except ImportError:  # SQLAlchemy < 1.4
+    from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
 
 class BaseModel:
     """A base class for all hbnb models."""
-    __abstract__ = True
     id = Column(String(60), primary_key=True, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     def __init__(self, *args, **kwargs):
         """Instantiates a new model."""
-        if kwargs:
-            for key, value in kwargs.items():
-                if key == "created_at" or key == "updated_at":
-                    if isinstance(value, str):
-                        value = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f")
-                if key != "__class__":
-                    setattr(self, key, value)
-            if "id" not in kwargs:
-                self.id = str(uuid.uuid4())
-            if "created_at" not in kwargs:
-                self.created_at = datetime.utcnow()
-            if "updated_at" not in kwargs:
-                self.updated_at = datetime.utcnow()
-        else:
-            self.id = str(uuid.uuid4())
-            self.created_at = datetime.utcnow()
-            self.updated_at = datetime.utcnow()
+        now = datetime.utcnow()
+        self.id = str(uuid.uuid4())
+        self.created_at = now
+        self.updated_at = now
+        for key, value in kwargs.items():
+            if key == "__class__":
+                continue
+            if key in ("created_at", "updated_at") and isinstance(value, str):
+                value = datetime.fromisoformat(value)
+            setattr(self, key, value)
 
     def __str__(self):
         """Returns a string representation of the instance."""
@@ -43,20 +39,29 @@ class BaseModel:
 
     def save(self):
         """Updates updated_at with current time and saves to storage."""
-        self.updated_at = datetime.utcnow()
         from models import storage
+        self.updated_at = datetime.utcnow()
         storage.new(self)
         storage.save()
 
     def to_dict(self):
-        """Convert instance into dict format."""
-        dictionary = self.__dict__.copy()
+        """Converts the instance into a dictionary."""
+        dictionary = {}
+        for key, value in self.__dict__.items():
+            if key == "_sa_instance_state":
+                continue
+            # skip loaded relationship objects (not JSON serializable)
+            if isinstance(value, BaseModel):
+                continue
+            if isinstance(value, list) and any(
+                    isinstance(v, BaseModel) for v in value):
+                continue
+            dictionary[key] = value
         dictionary["__class__"] = type(self).__name__
         if isinstance(self.created_at, datetime):
             dictionary["created_at"] = self.created_at.isoformat()
         if isinstance(self.updated_at, datetime):
             dictionary["updated_at"] = self.updated_at.isoformat()
-        dictionary.pop("_sa_instance_state", None)
         return dictionary
 
     def delete(self):

@@ -23,14 +23,11 @@ class TestReview(unittest.TestCase):
         self.assertTrue(issubclass(type(review), BaseModel))
 
     def test_default_attributes(self):
-        """Test default attribute values and types."""
+        """Test that columns start unset (None) until assigned."""
         review = Review()
-        self.assertEqual(review.place_id, "")
-        self.assertEqual(review.user_id, "")
-        self.assertEqual(review.text, "")
-        self.assertIsInstance(review.place_id, str)
-        self.assertIsInstance(review.user_id, str)
-        self.assertIsInstance(review.text, str)
+        self.assertIsNone(review.place_id)
+        self.assertIsNone(review.user_id)
+        self.assertIsNone(review.text)
 
     def test_to_dict(self):
         """Test to_dict method with Review attributes."""

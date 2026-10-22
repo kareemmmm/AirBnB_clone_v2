@@ -13,12 +13,20 @@ from models.review import Review
 
 
 class DBStorage:
-    """Handles SQLAlchemy database storage."""
+    """Handles storage in a MySQL database with SQLAlchemy."""
     __engine = None
     __session = None
+    __classes = {
+        "State": State,
+        "City": City,
+        "User": User,
+        "Place": Place,
+        "Amenity": Amenity,
+        "Review": Review
+    }
 
     def __init__(self):
-        """Initializes the DBStorage engine."""
+        """Creates the engine from the HBNB_MYSQL_* environment variables."""
         user = os.getenv('HBNB_MYSQL_USER')
         pwd = os.getenv('HBNB_MYSQL_PWD')
         host = os.getenv('HBNB_MYSQL_HOST')
@@ -34,56 +42,44 @@ class DBStorage:
             Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
-        """Query on the current database session all objects."""
-        obj_dict = {}
-        classes = {
-            "State": State,
-            "City": City,
-            "User": User,
-            "Place": Place,
-            "Amenity": Amenity,
-            "Review": Review
-        }
+        """Queries the current session for all objects (or of one class).
 
-        if cls:
-            if isinstance(cls, str):
-                cls = classes.get(cls)
-            if cls:
-                query = self.__session.query(cls)
-                for obj in query.all():
-                    key = "{}.{}".format(obj.__class__.__name__, obj.id)
-                    obj_dict[key] = obj
-        else:
-            for c in classes.values():
-                query = self.__session.query(c)
-                for obj in query.all():
-                    key = "{}.{}".format(obj.__class__.__name__, obj.id)
-                    obj_dict[key] = obj
+        cls can be a class or a class name (string).
+        """
+        if isinstance(cls, str):
+            cls = DBStorage.__classes.get(cls)
+            if cls is None:
+                return {}
+        classes = [cls] if cls is not None else DBStorage.__classes.values()
+        obj_dict = {}
+        for c in classes:
+            if c not in DBStorage.__classes.values():
+                continue
+            for obj in self.__session.query(c).all():
+                key = "{}.{}".format(obj.__class__.__name__, obj.id)
+                obj_dict[key] = obj
         return obj_dict
 
     def new(self, obj):
-        """Add the object to the current database session."""
+        """Adds the object to the current database session."""
         self.__session.add(obj)
 
     def save(self):
-        """Commit all changes of the current database session."""
+        """Commits all changes of the current database session."""
         self.__session.commit()
 
     def delete(self, obj=None):
-        """Delete from the current database session obj if not None."""
+        """Deletes obj from the current database session if not None."""
         if obj is not None:
             self.__session.delete(obj)
 
     def reload(self):
-        """Create all tables in the database and initialize session."""
+        """Creates all tables and a new thread-safe session."""
         Base.metadata.create_all(self.__engine)
-        sess_factory = sessionmaker(
-            bind=self.__engine,
-            expire_on_commit=False
-        )
-        Session = scoped_session(sess_factory)
-        self.__session = Session()
+        session_factory = sessionmaker(bind=self.__engine,
+                                       expire_on_commit=False)
+        self.__session = scoped_session(session_factory)
 
     def close(self):
-        """Call remove() on private session attribute."""
+        """Closes the current session (calls remove())."""
         self.__session.remove()

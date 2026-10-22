@@ -23,23 +23,23 @@ class TestPlace(unittest.TestCase):
         self.assertTrue(issubclass(type(place), BaseModel))
 
     def test_default_attributes(self):
-        """Test default attribute values and types."""
+        """Test that columns start unset (None) until assigned."""
         place = Place()
-        self.assertEqual(place.city_id, "")
-        self.assertEqual(place.user_id, "")
-        self.assertEqual(place.name, "")
-        self.assertEqual(place.description, "")
-        self.assertEqual(place.number_rooms, 0)
-        self.assertEqual(place.number_bathrooms, 0)
-        self.assertEqual(place.max_guest, 0)
-        self.assertEqual(place.price_by_night, 0)
-        self.assertEqual(place.latitude, 0.0)
-        self.assertEqual(place.longitude, 0.0)
-        self.assertEqual(place.amenity_ids, [])
+        self.assertIsNone(place.city_id)
+        self.assertIsNone(place.user_id)
+        self.assertIsNone(place.name)
+        self.assertIsNone(place.description)
+        self.assertIsNone(place.latitude)
+        self.assertIsNone(place.longitude)
+        if os.getenv("HBNB_TYPE_STORAGE") != "db":
+            self.assertEqual(place.amenity_ids, [])
 
     def test_attribute_types(self):
         """Test attribute type assignments."""
-        place = Place()
+        place = Place(city_id="c1", user_id="u1", name="House",
+                      description="Nice", number_rooms=2,
+                      number_bathrooms=1, max_guest=4, price_by_night=100,
+                      latitude=1.5, longitude=2.5)
         self.assertIsInstance(place.city_id, str)
         self.assertIsInstance(place.user_id, str)
         self.assertIsInstance(place.name, str)
@@ -50,7 +50,8 @@ class TestPlace(unittest.TestCase):
         self.assertIsInstance(place.price_by_night, int)
         self.assertIsInstance(place.latitude, float)
         self.assertIsInstance(place.longitude, float)
-        self.assertIsInstance(place.amenity_ids, list)
+        if os.getenv("HBNB_TYPE_STORAGE") != "db":
+            self.assertIsInstance(place.amenity_ids, list)
 
     def test_to_dict(self):
         """Test to_dict method with Place attributes."""

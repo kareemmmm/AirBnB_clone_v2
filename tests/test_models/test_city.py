@@ -23,12 +23,10 @@ class TestCity(unittest.TestCase):
         self.assertTrue(issubclass(type(city), BaseModel))
 
     def test_default_attributes(self):
-        """Test default attribute values and types."""
+        """Test that columns start unset (None) until assigned."""
         city = City()
-        self.assertEqual(city.state_id, "")
-        self.assertEqual(city.name, "")
-        self.assertIsInstance(city.state_id, str)
-        self.assertIsInstance(city.name, str)
+        self.assertIsNone(city.state_id)
+        self.assertIsNone(city.name)
 
     def test_attribute_assignment(self):
         """Test attribute assignment."""

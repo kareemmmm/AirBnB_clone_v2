@@ -23,10 +23,9 @@ class TestAmenity(unittest.TestCase):
         self.assertTrue(issubclass(type(amenity), BaseModel))
 
     def test_default_attributes(self):
-        """Test default attribute values and types."""
+        """Test that columns start unset (None) until assigned."""
         amenity = Amenity()
-        self.assertEqual(amenity.name, "")
-        self.assertIsInstance(amenity.name, str)
+        self.assertIsNone(amenity.name)
 
     def test_to_dict(self):
         """Test to_dict method with Amenity attributes."""

@@ -9,7 +9,7 @@ import models
 
 
 class State(BaseModel, Base):
-    """Represents a state for a MySQL database."""
+    """Represents a state."""
     __tablename__ = 'states'
     name = Column(String(128), nullable=False)
 
@@ -22,10 +22,6 @@ class State(BaseModel, Base):
     else:
         @property
         def cities(self):
-            """Getter attribute for FileStorage relationship with City."""
-            city_list = []
-            all_cities = models.storage.all(City)
-            for city in all_cities.values():
-                if city.state_id == self.id:
-                    city_list.append(city)
-            return city_list
+            """Getter for FileStorage: Cities linked to this state."""
+            return [c for c in models.storage.all(City).values()
+                    if c.state_id == self.id]

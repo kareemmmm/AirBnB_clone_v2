@@ -28,6 +28,7 @@ class TestFileStorage(unittest.TestCase):
     def test_new(self):
         """Test that new() adds an object to __objects."""
         bm = BaseModel()
+        models.storage.new(bm)
         key = "BaseModel.{}".format(bm.id)
         self.assertIn(key, models.storage.all())
 

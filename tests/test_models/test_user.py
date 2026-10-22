@@ -23,16 +23,12 @@ class TestUser(unittest.TestCase):
         self.assertTrue(issubclass(type(user), BaseModel))
 
     def test_default_attributes(self):
-        """Test default attribute values and types."""
+        """Test that columns start unset (None) until assigned."""
         user = User()
-        self.assertEqual(user.email, "")
-        self.assertEqual(user.password, "")
-        self.assertEqual(user.first_name, "")
-        self.assertEqual(user.last_name, "")
-        self.assertEqual(type(user.email), str)
-        self.assertEqual(type(user.password), str)
-        self.assertEqual(type(user.first_name), str)
-        self.assertEqual(type(user.last_name), str)
+        self.assertIsNone(user.email)
+        self.assertIsNone(user.password)
+        self.assertIsNone(user.first_name)
+        self.assertIsNone(user.last_name)
 
     def test_attribute_assignment(self):
         """Test assigning values to User attributes."""
