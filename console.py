@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """Defines the HBNBCommand console interpreter."""
 import cmd
+import shlex
 import models
 from models.base_model import BaseModel
 from models.user import User
@@ -39,7 +40,11 @@ class HBNBCommand(cmd.Cmd):
 
     def do_create(self, arg):
         """Creates a new instance of a class with given parameters and saves it."""
-        args = arg.split()
+        try:
+            args = shlex.split(arg)
+        except Exception:
+            args = arg.split()
+
         if len(args) == 0:
             print("** class name missing **")
             return
@@ -78,7 +83,10 @@ class HBNBCommand(cmd.Cmd):
 
     def do_show(self, arg):
         """Prints the string representation of an instance based on class name and id."""
-        args = arg.split()
+        try:
+            args = shlex.split(arg)
+        except Exception:
+            args = arg.split()
         if len(args) == 0:
             print("** class name missing **")
             return
@@ -97,7 +105,10 @@ class HBNBCommand(cmd.Cmd):
 
     def do_destroy(self, arg):
         """Deletes an instance based on the class name and id."""
-        args = arg.split()
+        try:
+            args = shlex.split(arg)
+        except Exception:
+            args = arg.split()
         if len(args) == 0:
             print("** class name missing **")
             return
@@ -117,7 +128,10 @@ class HBNBCommand(cmd.Cmd):
 
     def do_all(self, arg):
         """Prints all string representation of all instances based or not on class name."""
-        args = arg.split()
+        try:
+            args = shlex.split(arg)
+        except Exception:
+            args = arg.split()
         objs = models.storage.all()
         list_instances = []
         if len(args) > 0:
