@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/init/python3
 """Instantiates a storage object depending on environment variable."""
 import os
 
